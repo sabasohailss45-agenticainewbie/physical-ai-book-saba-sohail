@@ -1,12 +1,6 @@
 {
   "buildCommand": "cd textbook && npm install && npm run build",
   "outputDirectory": "textbook/build",
-  "functions": {
-    "chatbot/api/index.py": {
-      "runtime": "python3.11",
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/chatbot/api/index.py" }
   ],
