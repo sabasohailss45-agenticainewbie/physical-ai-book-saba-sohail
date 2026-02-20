@@ -1,0 +1,8 @@
+{
+  "label": "Module 3: Actuation & Control",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Dive into how robots move — from actuator hardware to kinematics, dynamics, and advanced control algorithms."
+  }
+}

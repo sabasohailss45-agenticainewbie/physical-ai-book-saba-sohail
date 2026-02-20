@@ -1,0 +1,160 @@
+openapi: "3.1.0"
+info:
+  title: Physical AI Textbook Chatbot API
+  version: "1.0.0"
+  description: RAG chatbot backend for the Physical AI & Humanoid Robotics textbook.
+
+servers:
+  - url: http://localhost:8000
+    description: Local development
+  - url: https://physical-ai-book-saba-sohail.vercel.app
+    description: Vercel production
+
+paths:
+  /api/health:
+    get:
+      summary: Health check
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+              example:
+                status: "ok"
+
+  /api/chat:
+    post:
+      summary: Ask a question answered by the textbook RAG pipeline
+      operationId: chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+            example:
+              question: "What is a humanoid robot?"
+              session_id: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Successful response with answer
+          headers:
+            X-Request-ID:
+              description: Unique request identifier for tracing
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+              example:
+                answer: "A humanoid robot is a robot with a body structure resembling the human form..."
+                session_id: "550e8400-e29b-41d4-a716-446655440000"
+                request_id: "123e4567-e89b-12d3-a456-426614174000"
+                sources:
+                  - chunk_id: "foundations-intro_0"
+                    chapter_slug: "foundations-intro"
+                    preview: "Physical AI refers to AI systems embodied in..."
+        "422":
+          description: Validation error (question too long or invalid session_id)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "question must be 2000 characters or fewer"
+                request_id: "123e4567-e89b-12d3-a456-426614174000"
+        "429":
+          description: Rate limit exceeded
+          headers:
+            Retry-After:
+              description: Seconds until next request is allowed
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Rate limit exceeded. Try again in 60 seconds."
+                request_id: "123e4567-e89b-12d3-a456-426614174000"
+        "503":
+          description: Upstream service unavailable (OpenAI or Qdrant)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Service temporarily unavailable. Please try again later."
+                request_id: "123e4567-e89b-12d3-a456-426614174000"
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - question
+        - session_id
+      properties:
+        question:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: The user's question about Physical AI / robotics content
+        session_id:
+          type: string
+          format: uuid
+          description: Client-generated UUID v4 identifying the conversation session
+
+    ChatResponse:
+      type: object
+      required:
+        - answer
+        - session_id
+        - request_id
+      properties:
+        answer:
+          type: string
+          description: LLM-generated answer grounded in textbook content
+        session_id:
+          type: string
+          format: uuid
+        request_id:
+          type: string
+          format: uuid
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/SourceChunk"
+          description: Top retrieved chunks used as context (may be empty if out-of-scope)
+
+    SourceChunk:
+      type: object
+      properties:
+        chunk_id:
+          type: string
+        chapter_slug:
+          type: string
+        preview:
+          type: string
+          description: First 100 chars of the chunk content
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - request_id
+      properties:
+        error:
+          type: string
+        request_id:
+          type: string
+          format: uuid

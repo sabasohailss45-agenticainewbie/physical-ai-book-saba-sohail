@@ -1,55 +1,126 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+SYNC IMPACT REPORT
+==================
+Version change: (none) → 1.0.0 (initial ratification)
+Modified principles: N/A (initial)
+Added sections:
+  - I. Content-First Principle
+  - II. API-Driven RAG
+  - III. Test-First (NON-NEGOTIABLE)
+  - IV. Twelve-Factor Configuration
+  - V. Observability & Tracing
+  - VI. Simplicity & Smallest Viable Change
+Removed sections: N/A
+Templates requiring updates:
+  ✅ .specify/templates/plan-template.md  — Constitution Check gate added
+  ✅ .specify/templates/spec-template.md  — scope sections aligned
+  ✅ .specify/templates/tasks-template.md — task categories aligned
+Follow-up TODOs: none
+-->
+
+# Physical AI & Humanoid Robotics Textbook — Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Content-First
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+Every feature, UI component, and service MUST serve the reader's learning journey.
+No infrastructure work ships without a corresponding user-facing benefit
+(a page, a chatbot response, or a navigable section).
+- Docusaurus pages are the canonical source of truth for all module content.
+- Content MUST be accurate, cite real research where possible, and be
+  structured as progressive chapters (intro → theory → application → exercises).
+- Markdown + MDX are the only accepted authoring formats; no proprietary CMS.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### II. API-Driven RAG (Retrieval-Augmented Generation)
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+The chatbot backend MUST be a stateless FastAPI service with a clean HTTP contract.
+- Embeddings MUST be generated via OpenAI `text-embedding-3-small` (or later).
+- Vector storage MUST use Qdrant (cloud or local).
+- Conversation history and user sessions MUST be persisted in Neon Postgres.
+- The chatbot widget MUST be an isolated React component that communicates
+  only via `/api/chat` — no direct DB or vector-store calls from the frontend.
+- All LLM calls MUST have explicit `system` prompts referencing textbook content.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### III. Test-First (NON-NEGOTIABLE)
 
-### [PRINCIPLE_6_NAME]
+TDD is mandatory for all backend services and API contracts:
+- Tests MUST be written and MUST FAIL before any implementation begins.
+- Red → Green → Refactor cycle is strictly enforced.
+- Minimum coverage: 80% for `chatbot/` service, 60% for content utilities.
+- Frontend components require at minimum smoke tests (render without crash).
 
+### IV. Twelve-Factor Configuration
 
-[PRINCIPLE__DESCRIPTION]
+No secrets, API keys, or environment-specific values MUST appear in source code.
+- All credentials MUST be loaded from environment variables / `.env` (git-ignored).
+- `.env.example` MUST be kept current with every required variable documented.
+- Vercel environment variables are the production secret store.
+- OPENAI_API_KEY, QDRANT_URL, QDRANT_API_KEY, DATABASE_URL MUST never be
+  committed to version control.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### V. Observability & Tracing
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+Every external call (OpenAI, Qdrant, Postgres) MUST be wrapped with:
+- Structured JSON logs (level, timestamp, latency_ms, status).
+- Error boundaries that return `{"error": "<message>", "request_id": "<uuid>"}`
+  with appropriate HTTP status codes (400/422/500).
+- FastAPI middleware MUST attach a `X-Request-ID` header to every response.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### VI. Simplicity & Smallest Viable Change
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- YAGNI: do not build features not in the current spec.
+- Prefer the smallest diff that satisfies acceptance criteria.
+- No premature abstraction — three similar lines of code is better than a
+  premature utility function.
+- Docusaurus plugins MUST only be added when a page requires a capability
+  that plain MDX cannot deliver.
+
+## Technology Stack
+
+| Layer | Technology | Version Constraint |
+|---|---|---|
+| Documentation site | Docusaurus | ^3.x |
+| Frontend language | TypeScript | ^5.x |
+| Backend language | Python | ^3.11 |
+| API framework | FastAPI | ^0.110 |
+| Vector store | Qdrant Cloud | latest stable |
+| Relational DB | Neon Postgres | latest (serverless) |
+| LLM provider | OpenAI | gpt-4o-mini (default) |
+| Deployment | Vercel | latest |
+| Package manager | npm (frontend) / pip (backend) | latest LTS |
+
+## Security Requirements
+
+- CORS on FastAPI MUST whitelist only the Vercel deployment domain and `localhost`.
+- SQL queries MUST use parameterised statements via `asyncpg` / SQLAlchemy ORM
+  — no raw string interpolation.
+- User input to the chatbot MUST be sanitised (length cap 2000 chars, strip HTML).
+- Rate limiting: chatbot endpoint MUST enforce max 20 req/min per IP via
+  `slowapi` or equivalent.
+
+## Development Workflow
+
+1. Feature work MUST start with a spec (`specs/<feature>/spec.md`).
+2. Plan (`specs/<feature>/plan.md`) MUST pass Constitution Check before coding.
+3. Tasks MUST reference spec user stories (US1, US2 …).
+4. Every PR MUST reference the task ID and include a test update.
+5. Commit messages follow Conventional Commits: `feat:`, `fix:`, `docs:`, `chore:`.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes all other practices defined in this repository.
+Amendments require:
+1. A written rationale explaining why the principle change is necessary.
+2. A version bump following semantic versioning rules (see below).
+3. An update to this file via PR reviewed by at least the project owner.
+4. A corresponding ADR if the change is architecturally significant.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Versioning policy**:
+- MAJOR — backward-incompatible removal or redefinition of a principle.
+- MINOR — new principle or materially expanded guidance added.
+- PATCH — clarifications, wording fixes, typo corrections.
+
+All PRs and code reviews MUST verify compliance with this constitution.
+
+**Version**: 1.0.0 | **Ratified**: 2026-02-21 | **Last Amended**: 2026-02-21

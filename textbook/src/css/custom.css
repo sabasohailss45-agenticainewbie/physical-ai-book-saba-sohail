@@ -1,0 +1,82 @@
+/**
+ * Physical AI & Humanoid Robotics Textbook — Global CSS
+ * Brand: dark navy + electric blue
+ */
+
+:root {
+  --ifm-color-primary: #1a73e8;
+  --ifm-color-primary-dark: #1563c9;
+  --ifm-color-primary-darker: #1258bb;
+  --ifm-color-primary-darkest: #0e469a;
+  --ifm-color-primary-light: #3283eb;
+  --ifm-color-primary-lighter: #4490ed;
+  --ifm-color-primary-lightest: #6aaaf2;
+  --ifm-code-font-size: 93%;
+  --docusaurus-highlighted-code-line-bg: rgba(26, 115, 232, 0.12);
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+  --ifm-heading-font-weight: 700;
+  --ifm-navbar-background-color: #0d1117;
+  --ifm-navbar-link-color: #e0e0e0;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #4da3ff;
+  --ifm-color-primary-dark: #2990ff;
+  --ifm-color-primary-darker: #1787ff;
+  --ifm-color-primary-darkest: #0068e0;
+  --ifm-color-primary-light: #71b6ff;
+  --ifm-color-primary-lighter: #85c2ff;
+  --ifm-color-primary-lightest: #add6ff;
+  --ifm-background-color: #0d1117;
+  --ifm-background-surface-color: #161b22;
+  --docusaurus-highlighted-code-line-bg: rgba(77, 163, 255, 0.15);
+}
+
+/* Navbar */
+.navbar {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Improve prose readability */
+.markdown p { line-height: 1.75; }
+.markdown h2 { margin-top: 2rem; }
+.markdown h3 { margin-top: 1.5rem; }
+
+/* Table styling */
+.markdown table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+.markdown table th {
+  background: var(--ifm-color-primary);
+  color: white;
+  padding: 8px 12px;
+}
+
+.markdown table td {
+  padding: 7px 12px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.markdown table tr:nth-child(even) {
+  background: var(--ifm-color-emphasis-100);
+}
+
+/* Code blocks */
+.prism-code {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+/* Callout cards in content */
+.markdown blockquote {
+  border-left: 4px solid var(--ifm-color-primary);
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin: 1.5rem 0;
+}
