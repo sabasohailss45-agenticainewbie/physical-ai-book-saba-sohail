@@ -63,3 +63,4 @@ async def generate_answer(
     except Exception as exc:
         logger.error("OpenAI chat completion failed: %s", exc)
         raise
+# force redeploy Sat, Feb 21, 2026  1:39:11 PM
