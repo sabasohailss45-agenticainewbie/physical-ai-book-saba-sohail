@@ -11,7 +11,7 @@ from app.services.retriever import retrieve_chunks
 from app.services.generator import generate_answer
 from app.services.db import save_turn
 from app.config import settings
-from app.main import limiter
+from app.limiter import limiter
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
