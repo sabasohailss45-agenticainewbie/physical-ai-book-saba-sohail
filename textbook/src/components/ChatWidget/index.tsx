@@ -61,7 +61,7 @@ export default function ChatWidget(): React.ReactElement {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch('https://physical-ai-book-saba-sohail-production.up.railway.app/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, session_id: sessionId }),
